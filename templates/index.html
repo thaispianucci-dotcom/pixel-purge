@@ -3,164 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIXEL::PURGE</title>
+    <title>PixelClean</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
-            background: #1a1a2e;
-            color: #00ff41;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            color: #1e293b;
             min-height: 100vh;
         }
 
         header {
-            background: #1a1a2e;
-            padding: 20px 40px;
-            border-bottom: 1px solid #00ff4133;
+            background: #fff;
+            padding: 16px 40px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
         header .logo {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             flex-shrink: 0;
         }
 
         header h1 {
-            font-size: 1.4rem;
-            color: #00ff41;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px #00ff4180;
+            font-size: 1.3rem;
+            color: #1e40af;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        header h1 span { color: #888; }
-
         header p {
-            color: #00ff4199;
+            color: #64748b;
             font-size: 0.8rem;
-            margin-top: 2px;
-            letter-spacing: 1px;
+            margin-top: 1px;
         }
 
         .controls {
-            background: #0d0d0d;
-            padding: 20px 40px;
+            background: #fff;
+            padding: 16px 40px;
             display: flex;
-            gap: 12px;
+            gap: 14px;
             align-items: center;
             flex-wrap: wrap;
-            border-bottom: 1px solid #00ff4120;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .controls label {
-            font-size: 0.8rem;
-            color: #00ff4199;
+            font-size: 0.82rem;
+            color: #475569;
+            font-weight: 500;
         }
 
         .controls input[type="range"] {
             width: 120px;
-            accent-color: #00ff41;
+            accent-color: #2563eb;
         }
 
         .drop-zone {
-            border: 2px dashed #00ff4140;
-            border-radius: 8px;
-            padding: 40px 20px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 48px 20px;
             text-align: center;
-            margin: 20px 40px;
+            margin: 24px 40px;
             cursor: pointer;
             transition: all 0.3s;
-            background: #0d0d0d;
+            background: #fff;
         }
 
         .drop-zone:hover, .drop-zone.dragover {
-            border-color: #00ff41;
-            background: #00ff4108;
-            box-shadow: 0 0 20px #00ff4115;
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 0 0 4px #2563eb15;
         }
 
         .drop-zone .icon {
             font-size: 2.5rem;
             margin-bottom: 12px;
-            opacity: 0.6;
         }
 
         .drop-zone p {
-            color: #00ff4180;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
         }
 
         .drop-zone .hint {
-            color: #00ff4150;
-            font-size: 0.7rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
         }
 
         .drop-zone.has-files {
-            border-color: #00ff4180;
-            background: #00ff4108;
+            border-color: #2563eb;
+            background: #eff6ff;
         }
 
         .file-count {
-            color: #00ff41;
+            color: #1e40af;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .btn {
             padding: 10px 24px;
-            border: 1px solid #00ff4160;
-            border-radius: 4px;
+            border: none;
+            border-radius: 8px;
             font-size: 0.85rem;
             cursor: pointer;
             font-weight: 600;
             font-family: inherit;
             transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .btn:hover { box-shadow: 0 0 12px #00ff4140; }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .btn-primary {
-            background: #00ff41;
-            color: #1a1a2e;
-            border-color: #00ff41;
-        }
-        .btn-secondary {
-            background: transparent;
-            color: #00ff41;
-            border: 1px solid #00ff4160;
-        }
-        .btn-danger {
-            background: #ff0040;
+            background: #2563eb;
             color: #fff;
-            border-color: #ff0040;
         }
+        .btn-primary:hover { background: #1d4ed8; }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+        }
+        .btn-danger:hover { background: #b91c1c; }
 
         .status-bar {
-            padding: 12px 40px;
-            background: #0d0d0d;
-            font-size: 0.8rem;
-            border-bottom: 1px solid #00ff4120;
+            padding: 10px 40px;
+            background: #fff;
+            font-size: 0.82rem;
+            border-bottom: 1px solid #e2e8f0;
             display: none;
-            color: #00ff41cc;
+            color: #475569;
         }
 
-        .status-bar::before { content: '> '; color: #00ff4180; }
         .status-bar.visible { display: block; }
 
         .progress-bar {
             margin: 0 40px;
             height: 4px;
-            background: #0d0d0d;
+            background: #e2e8f0;
             border-radius: 2px;
             overflow: hidden;
             display: none;
@@ -170,17 +160,16 @@
 
         .progress-bar .fill {
             height: 100%;
-            background: #00ff41;
+            background: #2563eb;
             width: 0%;
             transition: width 0.3s;
-            box-shadow: 0 0 8px #00ff41;
         }
 
         .loading {
             text-align: center;
             padding: 60px;
             display: none;
-            color: #00ff41;
+            color: #475569;
         }
 
         .loading.visible { display: block; }
@@ -188,8 +177,8 @@
         .loading .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #00ff4130;
-            border-top-color: #00ff41;
+            border: 3px solid #e2e8f0;
+            border-top-color: #2563eb;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin: 0 auto 16px;
@@ -197,28 +186,28 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .results { padding: 20px 40px; }
+        .results { padding: 24px 40px; }
 
         .group {
-            background: #0d0d0d;
-            border-radius: 4px;
+            background: #fff;
+            border-radius: 12px;
             margin-bottom: 24px;
             overflow: hidden;
-            border: 1px solid #00ff4125;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
         .group-header {
-            padding: 12px 20px;
-            background: #00ff4110;
+            padding: 14px 20px;
+            background: #f8fafc;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 600;
-            font-size: 0.85rem;
-            color: #00ff41;
+            font-size: 0.88rem;
+            color: #1e40af;
+            border-bottom: 1px solid #e2e8f0;
         }
-
-        .group-header::before { content: '// '; color: #00ff4160; }
 
         .group-header .select-actions {
             display: flex;
@@ -226,17 +215,19 @@
         }
 
         .group-header button {
-            background: none;
-            border: 1px solid #00ff4140;
-            color: #00ff4199;
-            padding: 4px 10px;
-            border-radius: 3px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            padding: 5px 12px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.75rem;
             font-family: inherit;
+            font-weight: 500;
+            transition: all 0.15s;
         }
 
-        .group-header button:hover { border-color: #00ff41; color: #00ff41; }
+        .group-header button:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
 
         .group-images {
             display: flex;
@@ -247,16 +238,16 @@
 
         .image-card {
             position: relative;
-            background: #1a1a2e;
-            border-radius: 4px;
+            background: #f8fafc;
+            border-radius: 10px;
             overflow: hidden;
             width: 220px;
-            border: 1px solid #00ff4120;
+            border: 2px solid transparent;
             transition: all 0.2s;
         }
 
-        .image-card:hover { border-color: #00ff4160; }
-        .image-card.selected { border-color: #00ff41; box-shadow: 0 0 12px #00ff4130; }
+        .image-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .image-card.selected { border-color: #2563eb; box-shadow: 0 0 0 3px #2563eb25; }
 
         .image-card img {
             width: 100%;
@@ -264,24 +255,21 @@
             object-fit: cover;
             display: block;
             cursor: pointer;
-            filter: saturate(0.8);
         }
 
-        .image-card:hover img { filter: saturate(1); }
-
         .image-card .info {
-            padding: 8px 10px;
-            font-size: 0.7rem;
-            color: #00ff4180;
+            padding: 10px 12px;
+            font-size: 0.72rem;
+            color: #64748b;
         }
 
         .image-card .info .filename {
-            color: #00ff41cc;
+            color: #1e293b;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .image-card .checkbox-area {
@@ -294,7 +282,7 @@
         .image-card .checkbox-area input {
             width: 20px;
             height: 20px;
-            accent-color: #00ff41;
+            accent-color: #2563eb;
             cursor: pointer;
         }
 
@@ -303,14 +291,15 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #1a1a2e;
-            border-top: 1px solid #ff004060;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
             padding: 14px 40px;
             display: none;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            color: #ff0040;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+            color: #1e293b;
         }
 
         .delete-bar.visible { display: flex; }
@@ -318,16 +307,17 @@
         .empty-state {
             text-align: center;
             padding: 80px 40px;
-            color: #00ff4150;
+            color: #94a3b8;
             display: none;
         }
 
         .empty-state.visible { display: block; }
+        .empty-state h2 { color: #64748b; margin-bottom: 8px; }
 
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.8);
             display: none;
             justify-content: center;
             align-items: center;
@@ -339,8 +329,7 @@
         .modal-overlay img {
             max-width: 90vw;
             max-height: 90vh;
-            border-radius: 4px;
-            border: 1px solid #00ff4140;
+            border-radius: 8px;
             cursor: pointer;
         }
     </style>
@@ -349,17 +338,18 @@
 
 <header>
     <svg class="logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="5" width="90" height="90" rx="6" stroke="#00ff41" stroke-width="2" fill="none" opacity="0.3"/>
-        <text x="50" y="42" text-anchor="middle" font-family="monospace" font-size="18" fill="#00ff41" opacity="0.5">&gt;_</text>
-        <rect x="20" y="50" width="28" height="22" rx="3" stroke="#00ff41" stroke-width="2" fill="none"/>
-        <rect x="52" y="50" width="28" height="22" rx="3" stroke="#00ff41" stroke-width="2" fill="#00ff41" opacity="0.15"/>
-        <line x1="40" y1="61" x2="52" y2="61" stroke="#00ff41" stroke-width="2" stroke-dasharray="3 2"/>
-        <circle cx="30" cy="58" r="3" fill="#00ff41" opacity="0.6"/>
-        <circle cx="62" cy="58" r="3" fill="#00ff41" opacity="0.6"/>
+        <rect x="5" y="5" width="90" height="90" rx="14" fill="#2563eb" opacity="0.1"/>
+        <rect x="5" y="5" width="90" height="90" rx="14" stroke="#2563eb" stroke-width="2" fill="none"/>
+        <rect x="22" y="30" width="26" height="20" rx="3" stroke="#2563eb" stroke-width="2" fill="#2563eb" opacity="0.15"/>
+        <rect x="52" y="30" width="26" height="20" rx="3" stroke="#2563eb" stroke-width="2" fill="#2563eb" opacity="0.15"/>
+        <circle cx="35" cy="38" r="3" fill="#2563eb" opacity="0.5"/>
+        <circle cx="65" cy="38" r="3" fill="#2563eb" opacity="0.5"/>
+        <line x1="42" y1="40" x2="52" y2="40" stroke="#2563eb" stroke-width="2" stroke-dasharray="3 2"/>
+        <path d="M40 60 L50 68 L72 42" stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <div>
-        <h1>PIXEL<span>::</span>PURGE</h1>
-        <p>[ upload // detect // eliminate ]</p>
+        <h1>PixelClean</h1>
+        <p>Encontre e remova fotos duplicadas</p>
     </div>
 </header>
 
@@ -372,7 +362,7 @@
 </div>
 
 <div id="dropZone" class="drop-zone">
-    <div class="icon">&#128194;</div>
+    <div class="icon">&#128247;</div>
     <p>Arraste suas fotos aqui ou clique para selecionar</p>
     <div class="hint">Formatos aceitos: JPG, PNG, BMP, WEBP, GIF, TIFF</div>
     <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
@@ -449,10 +439,9 @@
             dropZone.classList.add('has-files');
             dropZone.innerHTML = `
                 <div class="file-count">${uploadedFiles.length} foto(s) selecionada(s)</div>
-                <p style="margin-top: 8px; color: #00ff4160; font-size: 0.75rem;">Clique para alterar a seleção</p>
+                <p style="margin-top: 8px; color: #94a3b8; font-size: 0.8rem;">Clique para alterar a seleção</p>
                 <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
             `;
-            // Re-bind o input
             const newInput = dropZone.querySelector('#fileInput');
             newInput.addEventListener('change', () => handleFiles(newInput.files));
             dropZone.addEventListener('click', () => newInput.click(), { once: false });
@@ -511,7 +500,6 @@
                     reject(new Error('Erro de conexão'));
                 });
 
-                // Mostrar spinner após upload completar
                 xhr.upload.addEventListener('loadend', () => {
                     progressFill.style.width = '100%';
                     document.getElementById('loading').classList.add('visible');
@@ -553,7 +541,7 @@
             div.className = 'group';
             div.innerHTML = `
                 <div class="group-header">
-                    <span>Grupo ${gi + 1} - ${group.length} fotos semelhantes</span>
+                    <span>Grupo ${gi + 1} — ${group.length} fotos semelhantes</span>
                     <div class="select-actions">
                         <button onclick="selectAllButBest(${gi})">Manter melhor</button>
                         <button onclick="selectNone(${gi})">Limpar</button>
