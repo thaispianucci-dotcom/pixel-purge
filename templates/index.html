@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIXEL::PURGE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #00ff41;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #1a1a2e;
+            padding: 20px 40px;
+            border-bottom: 1px solid #00ff4133;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        header .logo {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            color: #00ff41;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00ff4180;
+        }
+
+        header h1 span { color: #888; }
+
+        header p {
+            color: #00ff4199;
+            font-size: 0.8rem;
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            background: #0d0d0d;
+            padding: 20px 40px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #00ff4120;
+        }
+
+        .controls label {
+            font-size: 0.8rem;
+            color: #00ff4199;
+        }
+
+        .controls input[type="range"] {
+            width: 120px;
+            accent-color: #00ff41;
+        }
+
+        .drop-zone {
+            border: 2px dashed #00ff4140;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 20px 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #0d0d0d;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #00ff41;
+            background: #00ff4108;
+            box-shadow: 0 0 20px #00ff4115;
+        }
+
+        .drop-zone .icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .drop-zone p {
+            color: #00ff4180;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone .hint {
+            color: #00ff4150;
+            font-size: 0.7rem;
+        }
+
+        .drop-zone.has-files {
+            border-color: #00ff4180;
+            background: #00ff4108;
+        }
+
+        .file-count {
+            color: #00ff41;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: 1px solid #00ff4160;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover { box-shadow: 0 0 12px #00ff4140; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .btn-primary {
+            background: #00ff41;
+            color: #1a1a2e;
+            border-color: #00ff41;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #00ff41;
+            border: 1px solid #00ff4160;
+        }
+        .btn-danger {
+            background: #ff0040;
+            color: #fff;
+            border-color: #ff0040;
+        }
+
+        .status-bar {
+            padding: 12px 40px;
+            background: #0d0d0d;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #00ff4120;
+            display: none;
+            color: #00ff41cc;
+        }
+
+        .status-bar::before { content: '> '; color: #00ff4180; }
+        .status-bar.visible { display: block; }
+
+        .progress-bar {
+            margin: 0 40px;
+            height: 4px;
+            background: #0d0d0d;
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.visible { display: block; }
+
+        .progress-bar .fill {
+            height: 100%;
+            background: #00ff41;
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 8px #00ff41;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            display: none;
+            color: #00ff41;
+        }
+
+        .loading.visible { display: block; }
+
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #00ff4130;
+            border-top-color: #00ff41;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .results { padding: 20px 40px; }
+
+        .group {
+            background: #0d0d0d;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            border: 1px solid #00ff4125;
+        }
+
+        .group-header {
+            padding: 12px 20px;
+            background: #00ff4110;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #00ff41;
+        }
+
+        .group-header::before { content: '// '; color: #00ff4160; }
+
+        .group-header .select-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .group-header button {
+            background: none;
+            border: 1px solid #00ff4140;
+            color: #00ff4199;
+            padding: 4px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: inherit;
+        }
+
+        .group-header button:hover { border-color: #00ff41; color: #00ff41; }
+
+        .group-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 16px 20px;
+        }
+
+        .image-card {
+            position: relative;
+            background: #1a1a2e;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 220px;
+            border: 1px solid #00ff4120;
+            transition: all 0.2s;
+        }
+
+        .image-card:hover { border-color: #00ff4160; }
+        .image-card.selected { border-color: #00ff41; box-shadow: 0 0 12px #00ff4130; }
+
+        .image-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+            filter: saturate(0.8);
+        }
+
+        .image-card:hover img { filter: saturate(1); }
+
+        .image-card .info {
+            padding: 8px 10px;
+            font-size: 0.7rem;
+            color: #00ff4180;
+        }
+
+        .image-card .info .filename {
+            color: #00ff41cc;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .image-card .checkbox-area {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 2;
+        }
+
+        .image-card .checkbox-area input {
+            width: 20px;
+            height: 20px;
+            accent-color: #00ff41;
+            cursor: pointer;
+        }
+
+        .delete-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            border-top: 1px solid #ff004060;
+            padding: 14px 40px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            color: #ff0040;
+        }
+
+        .delete-bar.visible { display: flex; }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: #00ff4150;
+            display: none;
+        }
+
+        .empty-state.visible { display: block; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .modal-overlay.visible { display: flex; }
+
+        .modal-overlay img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 4px;
+            border: 1px solid #00ff4140;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <svg class="logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="90" height="90" rx="6" stroke="#00ff41" stroke-width="2" fill="none" opacity="0.3"/>
+        <text x="50" y="42" text-anchor="middle" font-family="monospace" font-size="18" fill="#00ff41" opacity="0.5">&gt;_</text>
+        <rect x="20" y="50" width="28" height="22" rx="3" stroke="#00ff41" stroke-width="2" fill="none"/>
+        <rect x="52" y="50" width="28" height="22" rx="3" stroke="#00ff41" stroke-width="2" fill="#00ff41" opacity="0.15"/>
+        <line x1="40" y1="61" x2="52" y2="61" stroke="#00ff41" stroke-width="2" stroke-dasharray="3 2"/>
+        <circle cx="30" cy="58" r="3" fill="#00ff41" opacity="0.6"/>
+        <circle cx="62" cy="58" r="3" fill="#00ff41" opacity="0.6"/>
+    </svg>
+    <div>
+        <h1>PIXEL<span>::</span>PURGE</h1>
+        <p>[ upload // detect // eliminate ]</p>
+    </div>
+</header>
+
+<div class="controls">
+    <label>
+        Sensibilidade: <span id="thresholdValue">10</span>
+        <input type="range" id="threshold" min="1" max="25" value="10">
+    </label>
+    <button class="btn btn-primary" id="scanBtn" onclick="startScan()" disabled>Escanear</button>
+</div>
+
+<div id="dropZone" class="drop-zone">
+    <div class="icon">&#128194;</div>
+    <p>Arraste suas fotos aqui ou clique para selecionar</p>
+    <div class="hint">Formatos aceitos: JPG, PNG, BMP, WEBP, GIF, TIFF</div>
+    <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
+</div>
+
+<div class="progress-bar" id="progressBar">
+    <div class="fill" id="progressFill"></div>
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Processando imagens e calculando similaridade...</p>
+</div>
+
+<div class="empty-state" id="emptyState">
+    <h2>Nenhum grupo de fotos semelhantes encontrado</h2>
+    <p>Tente ajustar a sensibilidade ou envie mais fotos.</p>
+</div>
+
+<div class="results" id="results"></div>
+
+<div class="delete-bar" id="deleteBar">
+    <span id="deleteCount">0 fotos selecionadas</span>
+    <button class="btn btn-danger" onclick="deleteSelected()">Remover Selecionadas</button>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="closeModal()">
+    <img id="modalImg" src="" alt="">
+</div>
+
+<script>
+    const thresholdSlider = document.getElementById('threshold');
+    const thresholdValue = document.getElementById('thresholdValue');
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const scanBtn = document.getElementById('scanBtn');
+
+    thresholdSlider.addEventListener('input', () => {
+        thresholdValue.textContent = thresholdSlider.value;
+    });
+
+    let uploadedFiles = [];
+    let allGroups = [];
+    let selectedFiles = new Set();
+    let currentSessionId = '';
+
+    // --- Drop zone ---
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', () => {
+        handleFiles(fileInput.files);
+    });
+
+    function handleFiles(files) {
+        uploadedFiles = Array.from(files);
+        if (uploadedFiles.length > 0) {
+            dropZone.classList.add('has-files');
+            dropZone.innerHTML = `
+                <div class="file-count">${uploadedFiles.length} foto(s) selecionada(s)</div>
+                <p style="margin-top: 8px; color: #00ff4160; font-size: 0.75rem;">Clique para alterar a seleção</p>
+                <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
+            `;
+            // Re-bind o input
+            const newInput = dropZone.querySelector('#fileInput');
+            newInput.addEventListener('change', () => handleFiles(newInput.files));
+            dropZone.addEventListener('click', () => newInput.click(), { once: false });
+            scanBtn.disabled = false;
+        }
+    }
+
+    function imageUrl(filename) {
+        return `/image/${currentSessionId}/${encodeURIComponent(filename)}`;
+    }
+
+    async function startScan() {
+        if (uploadedFiles.length === 0) {
+            alert('Selecione fotos primeiro.');
+            return;
+        }
+
+        scanBtn.disabled = true;
+        document.getElementById('results').innerHTML = '';
+        document.getElementById('statusBar').classList.remove('visible');
+        document.getElementById('emptyState').classList.remove('visible');
+        document.getElementById('deleteBar').classList.remove('visible');
+        selectedFiles.clear();
+
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        progressBar.classList.add('visible');
+        progressFill.style.width = '0%';
+
+        const formData = new FormData();
+        uploadedFiles.forEach(f => formData.append('files', f));
+        formData.append('threshold', thresholdSlider.value);
+
+        try {
+            const xhr = new XMLHttpRequest();
+            const response = await new Promise((resolve, reject) => {
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const pct = Math.round((e.loaded / e.total) * 100);
+                        progressFill.style.width = pct + '%';
+                    }
+                });
+
+                xhr.addEventListener('load', () => {
+                    progressBar.classList.remove('visible');
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(JSON.parse(xhr.responseText));
+                    } else {
+                        const err = JSON.parse(xhr.responseText);
+                        reject(new Error(err.error || 'Erro no servidor'));
+                    }
+                });
+
+                xhr.addEventListener('error', () => {
+                    progressBar.classList.remove('visible');
+                    reject(new Error('Erro de conexão'));
+                });
+
+                // Mostrar spinner após upload completar
+                xhr.upload.addEventListener('loadend', () => {
+                    progressFill.style.width = '100%';
+                    document.getElementById('loading').classList.add('visible');
+                });
+
+                xhr.open('POST', '/upload');
+                xhr.send(formData);
+            });
+
+            document.getElementById('loading').classList.remove('visible');
+
+            currentSessionId = response.session_id;
+            allGroups = response.groups;
+
+            const statusBar = document.getElementById('statusBar');
+            statusBar.textContent = `${response.total_images} imagens enviadas | ${response.total_groups} grupo(s) de fotos semelhantes`;
+            statusBar.classList.add('visible');
+
+            if (response.total_groups === 0) {
+                document.getElementById('emptyState').classList.add('visible');
+            } else {
+                renderGroups(response.groups);
+            }
+        } catch (e) {
+            document.getElementById('loading').classList.remove('visible');
+            progressBar.classList.remove('visible');
+            alert('Erro: ' + e.message);
+        } finally {
+            scanBtn.disabled = false;
+        }
+    }
+
+    function renderGroups(groups) {
+        const container = document.getElementById('results');
+        container.innerHTML = '';
+
+        groups.forEach((group, gi) => {
+            const div = document.createElement('div');
+            div.className = 'group';
+            div.innerHTML = `
+                <div class="group-header">
+                    <span>Grupo ${gi + 1} - ${group.length} fotos semelhantes</span>
+                    <div class="select-actions">
+                        <button onclick="selectAllButBest(${gi})">Manter melhor</button>
+                        <button onclick="selectNone(${gi})">Limpar</button>
+                    </div>
+                </div>
+                <div class="group-images" id="group-${gi}">
+                    ${group.map((img, ii) => `
+                        <div class="image-card" id="card-${gi}-${ii}">
+                            <div class="checkbox-area">
+                                <input type="checkbox" onchange="toggleSelect(${gi}, ${ii})"
+                                       id="cb-${gi}-${ii}">
+                            </div>
+                            <img src="${imageUrl(img.path)}" alt="${img.filename}"
+                                 onclick="openModal('${escPath(img.path)}')" loading="lazy">
+                            <div class="info">
+                                <div class="filename" title="${img.filename}">${img.filename}</div>
+                                <div>${img.resolution} | ${img.size} | ${img.modified}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function escPath(p) {
+        return p.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function toggleSelect(gi, ii) {
+        const path = allGroups[gi][ii].path;
+        const cb = document.getElementById(`cb-${gi}-${ii}`);
+        const card = document.getElementById(`card-${gi}-${ii}`);
+
+        if (cb.checked) {
+            selectedFiles.add(path);
+            card.classList.add('selected');
+        } else {
+            selectedFiles.delete(path);
+            card.classList.remove('selected');
+        }
+        updateDeleteBar();
+    }
+
+    function selectAllButBest(gi) {
+        const group = allGroups[gi];
+        group.forEach((img, ii) => {
+            const cb = document.getElementById(`cb-${gi}-${ii}`);
+            const card = document.getElementById(`card-${gi}-${ii}`);
+            if (ii === 0) {
+                cb.checked = false;
+                card.classList.remove('selected');
+                selectedFiles.delete(img.path);
+            } else {
+                cb.checked = true;
+                card.classList.add('selected');
+                selectedFiles.add(img.path);
+            }
+        });
+        updateDeleteBar();
+    }
+
+    function selectNone(gi) {
+        const group = allGroups[gi];
+        group.forEach((img, ii) => {
+            const cb = document.getElementById(`cb-${gi}-${ii}`);
+            const card = document.getElementById(`card-${gi}-${ii}`);
+            cb.checked = false;
+            card.classList.remove('selected');
+            selectedFiles.delete(img.path);
+        });
+        updateDeleteBar();
+    }
+
+    function updateDeleteBar() {
+        const bar = document.getElementById('deleteBar');
+        const count = document.getElementById('deleteCount');
+        if (selectedFiles.size > 0) {
+            bar.classList.add('visible');
+            count.textContent = `${selectedFiles.size} foto(s) selecionada(s)`;
+        } else {
+            bar.classList.remove('visible');
+        }
+    }
+
+    async function deleteSelected() {
+        if (selectedFiles.size === 0) return;
+
+        const confirmed = confirm(
+            `Remover ${selectedFiles.size} foto(s) duplicadas?\n\nAs fotos serão removidas do servidor.`
+        );
+        if (!confirmed) return;
+
+        try {
+            const resp = await fetch('/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: currentSessionId,
+                    files: Array.from(selectedFiles)
+                })
+            });
+            const data = await resp.json();
+
+            if (data.deleted.length > 0) {
+                alert(`${data.deleted.length} foto(s) removida(s).`);
+                const deletedSet = new Set(data.deleted);
+                for (let gi = allGroups.length - 1; gi >= 0; gi--) {
+                    allGroups[gi] = allGroups[gi].filter(img => !deletedSet.has(img.path));
+                }
+                selectedFiles.clear();
+                allGroups = allGroups.filter(g => g.length > 1);
+                renderGroups(allGroups);
+                updateDeleteBar();
+
+                const statusBar = document.getElementById('statusBar');
+                statusBar.textContent = `${allGroups.length} grupo(s) restante(s) | ${data.deleted.length} foto(s) removida(s)`;
+                if (allGroups.length === 0) {
+                    document.getElementById('emptyState').classList.add('visible');
+                    statusBar.textContent = 'Todas as duplicatas foram resolvidas!';
+                }
+            }
+            if (data.errors.length > 0) {
+                alert('Alguns erros ocorreram:\n' + data.errors.join('\n'));
+            }
+        } catch (e) {
+            alert('Erro: ' + e.message);
+        }
+    }
+
+    function openModal(path) {
+        document.getElementById('modalImg').src = imageUrl(path);
+        document.getElementById('modal').classList.add('visible');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('visible');
+    }
+</script>
+
+</body>
+</html>
