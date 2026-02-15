@@ -363,9 +363,14 @@
 
 <div id="dropZone" class="drop-zone">
     <div class="icon">&#128247;</div>
-    <p>Arraste suas fotos aqui ou clique para selecionar</p>
-    <div class="hint">Formatos aceitos: JPG, PNG, BMP, WEBP, GIF, TIFF</div>
+    <p>Arraste suas fotos aqui</p>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+        <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('fileInput').click();">Selecionar Fotos</button>
+        <button class="btn" style="background: #e2e8f0; color: #475569;" onclick="event.stopPropagation(); document.getElementById('folderInput').click();">Selecionar Pasta</button>
+    </div>
+    <div class="hint" style="margin-top: 10px;">Formatos aceitos: JPG, PNG, BMP, WEBP, GIF, TIFF</div>
     <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
+    <input type="file" id="folderInput" webkitdirectory multiple style="display:none">
 </div>
 
 <div class="progress-bar" id="progressBar">
@@ -400,6 +405,7 @@
     const thresholdValue = document.getElementById('thresholdValue');
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
+    const folderInput = document.getElementById('folderInput');
     const scanBtn = document.getElementById('scanBtn');
 
     thresholdSlider.addEventListener('input', () => {
@@ -412,8 +418,6 @@
     let currentSessionId = '';
 
     // --- Drop zone ---
-    dropZone.addEventListener('click', () => fileInput.click());
-
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.classList.add('dragover');
@@ -433,18 +437,29 @@
         handleFiles(fileInput.files);
     });
 
+    folderInput.addEventListener('change', () => {
+        handleFiles(folderInput.files);
+    });
+
     function handleFiles(files) {
-        uploadedFiles = Array.from(files);
+        const imageExts = ['.jpg', '.jpeg', '.png', '.bmp', '.webp', '.gif', '.tiff', '.tif'];
+        uploadedFiles = Array.from(files).filter(f => {
+            const ext = f.name.substring(f.name.lastIndexOf('.')).toLowerCase();
+            return imageExts.includes(ext);
+        });
         if (uploadedFiles.length > 0) {
             dropZone.classList.add('has-files');
             dropZone.innerHTML = `
                 <div class="file-count">${uploadedFiles.length} foto(s) selecionada(s)</div>
-                <p style="margin-top: 8px; color: #94a3b8; font-size: 0.8rem;">Clique para alterar a seleção</p>
-                <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('fileInput2').click();">Trocar Fotos</button>
+                    <button class="btn" style="background: #e2e8f0; color: #475569;" onclick="event.stopPropagation(); document.getElementById('folderInput2').click();">Trocar Pasta</button>
+                </div>
+                <input type="file" id="fileInput2" multiple accept="image/*" style="display:none">
+                <input type="file" id="folderInput2" webkitdirectory multiple style="display:none">
             `;
-            const newInput = dropZone.querySelector('#fileInput');
-            newInput.addEventListener('change', () => handleFiles(newInput.files));
-            dropZone.addEventListener('click', () => newInput.click(), { once: false });
+            document.getElementById('fileInput2').addEventListener('change', function() { handleFiles(this.files); });
+            document.getElementById('folderInput2').addEventListener('change', function() { handleFiles(this.files); });
             scanBtn.disabled = false;
         }
     }
